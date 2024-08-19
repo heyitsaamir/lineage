@@ -1,74 +1,84 @@
-'use client'
+"use client";
 
-import { stratify, tree } from 'd3-hierarchy';
-import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
+import { stratify, tree } from "d3-hierarchy";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo } from "react";
 import {
+  type Edge as FlowEdge,
+  type Node as FlowNode,
+  Panel,
   ReactFlow,
   ReactFlowProvider,
-  Panel,
-  useNodesState,
   useEdgesState,
+  useNodesState,
   useReactFlow,
-} from '@xyflow/react';
+} from "@xyflow/react";
 
-import '@xyflow/react/dist/style.css';
+import "@xyflow/react/dist/style.css";
+
+type Node = FlowNode & {
+  data: FlowNode["data"] & { label: string };
+};
+
+type Edge = FlowEdge & {
+  animated: boolean;
+};
 
 const initialNodes = [
   {
-    id: '1',
-    type: 'input',
-    data: { label: 'input' },
+    id: "1",
+    type: "input",
+    data: { label: "input" },
     position: { x: 0, y: 0 },
   },
   {
-    id: '2',
-    data: { label: 'node 2' },
+    id: "2",
+    data: { label: "node 2" },
     position: { x: 0, y: 100 },
   },
   {
-    id: '2a',
-    data: { label: 'node 2a' },
+    id: "2a",
+    data: { label: "node 2a" },
     position: { x: 0, y: 200 },
   },
   {
-    id: '2b',
-    data: { label: 'node 2b' },
+    id: "2b",
+    data: { label: "node 2b" },
     position: { x: 0, y: 300 },
   },
   {
-    id: '2c',
-    data: { label: 'node 2c' },
+    id: "2c",
+    data: { label: "node 2c" },
     position: { x: 0, y: 400 },
   },
   {
-    id: '2d',
-    data: { label: 'node 2d' },
+    id: "2d",
+    data: { label: "node 2d" },
     position: { x: 0, y: 500 },
   },
   {
-    id: '3',
-    data: { label: 'node 3' },
+    id: "3",
+    data: { label: "node 3" },
     position: { x: 200, y: 100 },
   },
 ];
 
 export const initialEdges = [
-  { id: 'e12', source: '1', target: '2', animated: true },
-  { id: 'e13', source: '1', target: '3', animated: true },
-  { id: 'e22a', source: '2', target: '2a', animated: true },
-  { id: 'e22b', source: '2', target: '2b', animated: true },
-  { id: 'e22c', source: '2', target: '2c', animated: true },
-  { id: 'e2c2d', source: '2c', target: '2d', animated: true },
+  { id: "e12", source: "1", target: "2", animated: true },
+  { id: "e13", source: "1", target: "3", animated: true },
+  { id: "e22a", source: "2", target: "2a", animated: true },
+  { id: "e22b", source: "2", target: "2b", animated: true },
+  { id: "e22c", source: "2", target: "2c", animated: true },
+  { id: "e2c2d", source: "2c", target: "2d", animated: true },
 ];
 
-const g = tree();
+const g = tree<Node>();
 
-const getLayoutedElements = (nodes, edges, options) => {
+const getLayoutedElements = (nodes: Node[], edges: Edge[], options: any) => {
   if (nodes.length === 0 || document == null) return { nodes, edges };
 
-  const width = 200
-  const height = 80
-  const hierarchy = stratify()
+  const width = 200;
+  const height = 80;
+  const hierarchy = stratify<Node>()
     .id((node) => node.id)
     .parentId((node) => edges.find((edge) => edge.target === node.id)?.source);
   const root = hierarchy(nodes);
@@ -88,11 +98,9 @@ const LayoutFlow = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   const onLayout = useCallback(
-    (direction) => {
+    () => {
       const { nodes: layoutedNodes, edges: layoutedEdges } =
-        getLayoutedElements(nodes, edges, {
-          direction,
-        });
+        getLayoutedElements(nodes, edges, {});
 
       setNodes([...layoutedNodes]);
       setEdges([...layoutedEdges]);
@@ -105,8 +113,8 @@ const LayoutFlow = () => {
   );
 
   useLayoutEffect(() => {
-    onLayout(null)
-  }, [])
+    onLayout();
+  }, []);
 
   return (
     <ReactFlow
@@ -115,7 +123,7 @@ const LayoutFlow = () => {
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       fitView
-      colorMode='system'
+      colorMode="system"
     />
   );
 };

@@ -120,7 +120,7 @@ const LayoutFlow = () => {
   );
 };
 
-export default function () {
+export default function Lineage() {
   return (
     <ReactFlowProvider>
       <LayoutFlow />
